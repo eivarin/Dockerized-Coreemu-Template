@@ -3,6 +3,7 @@ services:
   core:
     image: petedavidson887/xclock:0.0.1
     container_name: core
+    command: /bin/bash
     environment:
       - DISPLAY
     volumes:
