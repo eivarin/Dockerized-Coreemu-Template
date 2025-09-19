@@ -11,4 +11,4 @@ else
   docker-compose up -d core
   sleep 4
 fi
-docker exec -it core bash
+docker exec -it core core-gui
