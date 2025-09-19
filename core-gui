@@ -4,6 +4,6 @@ if [[ "$OSTYPE" == "darwin"* ]]; then
   open -a XQuartz
   NEW_DISPLAY=docker.for.mac.host.internal:0
 fi
-xhost +local:host > /dev/null
+xhost +local:root > /dev/null
 export DISPLAY=$NEW_DISPLAY
 docker-compose up -d & sleep 4 ; docker exec -it core core-gui
