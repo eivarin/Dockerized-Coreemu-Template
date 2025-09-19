@@ -5,4 +5,5 @@ if [[ "$OSTYPE" == "darwin"* ]]; then
   export DISPLAY_BIND=$(echo $DISPLAY | sed -E "s/[^/]+:[[:digit:]]$//"):/tmp/display:rw
   export DISPLAY="/tmp/display/org.xquartz:0"
 fi
-docker-compose up -d & sleep 4 ; docker exec -it core core-gui
+# docker-compose up -d & sleep 4 ; docker exec -it core core-gui
+docker-compose up
