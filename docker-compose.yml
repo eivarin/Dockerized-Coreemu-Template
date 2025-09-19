@@ -9,7 +9,6 @@ services:
       - /tmp/.X11-unix:/tmp/.X11-unix:rw
       - ./volume:/volume
       - ./.bashrc:/root/.bashrc
-    user: "${UID}:${GID}"
     privileged: true
     stdin_open: true 
     tty: true
@@ -22,7 +21,6 @@ services:
     volumes:
       - ./volume:/volume
       - ./.bashrc:/root/.bashrc
-    user: "${UID}:${GID}"
     privileged: true
     stdin_open: true 
     tty: true
