@@ -3,7 +3,6 @@ services:
   core:
     image: ghcr.io/eivarin/coreemu:coreemu-9.2.1
     container_name: core
-    command: /bin/bash
     environment:
       - DISPLAY
     volumes:
