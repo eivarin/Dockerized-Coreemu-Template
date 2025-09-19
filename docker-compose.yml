@@ -6,7 +6,7 @@ services:
     environment:
       - DISPLAY
     volumes:
-      - ${DISPLAY_BIND:-/tmp/.X11-unix:/tmp/.X11-unix}:rw
+      - ${DISPLAY_BIND:-/tmp/.X11-unix}:/tmp/.X11-unix:rw
       - ./volume:/volume
       - ./.bashrc:/root/.bashrc
     user: "${UID}:${GID}"
