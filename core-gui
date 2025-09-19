@@ -6,5 +6,4 @@ if [[ "$OSTYPE" == "darwin"* ]]; then
   export DISPLAY="/tmp/display/org.xquartz:0"
 fi
 # docker-compose up -d & sleep 4 ; docker exec -it core core-gui
-docker-compose down
-docker-compose up
+docker-compose up -d & sleep 4 ; docker exec -it core bash
