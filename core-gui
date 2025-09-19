@@ -2,7 +2,7 @@
 if [[ "$OSTYPE" == "darwin"* ]]; then
   open -a XQuartz
   xhost +local:root > /dev/null
-  export DISPLAY_BIND="'$DISPLAY':'/tmp/.X11-unix/org.xquartz:0'"
+  export DISPLAY_BIND=$(echo $DISPLAY | sed -E "s/[^/]+:[[:digit:]]$//")
   export DISPLAY="/tmp/.X11-unix/org.xquartz:0"
 fi
 docker-compose up -d & sleep 4 ; docker exec -it core core-gui
