@@ -1,12 +1,25 @@
-version: '3'
 services:
   core:
     image: ghcr.io/eivarin/coreemu:coreemu-9.2.1
     container_name: core
+    command: core-daemon
     environment:
       - DISPLAY
     volumes:
       - /tmp/.X11-unix:/tmp/.X11-unix:rw
+      - ./volume:/volume
+      - ./.bashrc:/root/.bashrc
+    user: "${UID}:${GID}"
+    privileged: true
+    stdin_open: true 
+    tty: true
+  core-for-mac:
+    image: ghcr.io/eivarin/coreemu:coreemu-9.2.1
+    container_name: core
+    command: core-daemon
+    environment:
+      - DISPLAY
+    volumes:
       - ./volume:/volume
       - ./.bashrc:/root/.bashrc
     user: "${UID}:${GID}"

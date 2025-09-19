@@ -1,10 +1,14 @@
 #!/bin/sh
-NEW_DISPLAY=$DISPLAY
 if [[ "$OSTYPE" == "darwin"* ]]; then
   open -a XQuartz
-  NEW_DISPLAY=docker.for.mac.host.internal:0
   xhost + > /dev/null
+  export DISPLAY=:0
+  docker-compose up -d core-for-mac
+  sleep 4
+  docker exec -it core bash -c "socat UNIX-LISTEN:/tmp/.X11-unix/X0,fork,reuseaddr,unlink-early,mode=770 TCP:docker.for.mac.host.internal:6000 &"
+else
+  xhost +local:root
+  docker-compose up -d core
+  sleep 4
 fi
-export DISPLAY=$NEW_DISPLAY
-xhost +local:root > /dev/null
-docker-compose up -d & sleep 4 ; docker exec -it core core-gui
+docker exec -it core bash 
