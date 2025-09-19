@@ -5,7 +5,7 @@ if [[ "$OSTYPE" == "darwin"* ]]; then
   export DISPLAY=:0
   docker-compose up -d core-for-mac
   sleep 4
-  docker exec -it core bash -c "make -p /tmp/.X11-unix && socat UNIX-LISTEN:/tmp/.X11-unix/X0,fork,reuseaddr,unlink-early,mode=770 TCP:docker.for.mac.host.internal:6000 &"
+  docker exec -it core bash -c "mkdir -p /tmp/.X11-unix && socat UNIX-LISTEN:/tmp/.X11-unix/X0,fork,reuseaddr,unlink-early,mode=770 TCP:docker.for.mac.host.internal:6000 &"
 else
   xhost +local:root
   docker-compose up -d core
