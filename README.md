@@ -1,4 +1,4 @@
-# Dockerized-CoreEmu-Template
+# Dockerized-Coreemu-Template
 A template repository to start working with a dockerized version of Coreemu.
 ## Requirements:
 - docker ([Official Installation Tutorial](https://docs.docker.com/engine/install/))
