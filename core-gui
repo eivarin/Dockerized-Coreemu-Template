@@ -1,6 +1,9 @@
 #!/bin/sh
 if [[ "$OSTYPE" == "darwin"* ]]; then
-  export DISPLAY="docker.for.mac.host.internal:0"
+else
+  open -a XQuartz
+  xhost +local:root > /dev/null
+  export DISPLAY_BIND="$DISPLAY:/tmp/.X11-unix/org.xquartz:0"
+  export DISPLAY="/tmp/.X11-unix/org.xquartz:0"
 fi
-xhost +local:root > /dev/null
 docker-compose up -d & sleep 4 ; docker exec -it core core-gui
