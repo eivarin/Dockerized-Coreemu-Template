@@ -3,7 +3,9 @@ A template repository to start working with a dockerized version of Coreemu.
 ## Requirements:
 - docker ([Official Installation Tutorial](https://docs.docker.com/engine/install/))
 - docker-compose
-- X11 forwarding capability on Linux and macOS (not needed on Windows)
+- X11 forwarding capability:
+  - Linux (Should come out of the box if using Xorg. Otherwise needs Xwayland running)
+  - macOS ([tutorial](https://gist.github.com/sorny/969fe55d85c9b0035b0109a31cbcb088))
 ## Setup:
 - `sh setup.sh` (This step may take a lot of time depending on your internet download speed)
 ## Run:

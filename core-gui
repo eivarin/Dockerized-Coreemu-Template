@@ -1,6 +1,14 @@
 #!/bin/sh
 if [[ "$OSTYPE" == "darwin"* ]]; then
-  export DISPLAY="docker.for.mac.host.internal:0"
+  open -a XQuartz
+  xhost + > /dev/null
+  export DISPLAY=:0
+  docker-compose up -d core-for-mac
+  sleep 4
+  docker exec -itd core bash -c "mkdir -p /tmp/.X11-unix && socat UNIX-LISTEN:/tmp/.X11-unix/X0,fork,reuseaddr,unlink-early,mode=770 TCP:docker.for.mac.host.internal:6000"
+else
+  xhost +local:root
+  docker-compose up -d core
+  sleep 4
 fi
-xhost +local:root > /dev/null
-docker-compose up -d & sleep 4 ; docker exec -it core core-gui
+docker exec -it core core-gui
