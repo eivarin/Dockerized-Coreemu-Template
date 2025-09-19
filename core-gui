@@ -1,9 +1,9 @@
 #!/bin/sh
+NEW_DISPLAY=$DISPLAY
 if [[ "$OSTYPE" == "darwin"* ]]; then
   open -a XQuartz
-  xhost + > /dev/null
-  export DISPLAY_BIND=$(echo $DISPLAY | sed -E "s/[^/]+:[[:digit:]]$//"):/tmp/display:rw
-  export DISPLAY="/tmp/display/org.xquartz:0"
+  NEW_DISPLAY=docker.for.mac.host.internal:0
 fi
-# docker-compose up -d & sleep 4 ; docker exec -it core core-gui
-docker-compose up -d & sleep 4 ; docker exec -it core bash
+xhost +local:host > /dev/null
+export DISPLAY=$NEW_DISPLAY
+docker-compose up -d & sleep 4 ; docker exec -it core core-gui

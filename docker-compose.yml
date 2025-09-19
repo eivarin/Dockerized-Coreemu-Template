@@ -1,13 +1,12 @@
 version: '3'
 services:
   core:
-    image: petedavidson887/xclock:0.0.1
+    image: ghcr.io/eivarin/coreemu:coreemu-9.2.1
     container_name: core
     command: /bin/bash
     environment:
       - DISPLAY
     volumes:
-      - ${DISPLAY_BIND:-}
       - /tmp/.X11-unix:/tmp/.X11-unix:rw
       - ./volume:/volume
       - ./.bashrc:/root/.bashrc
