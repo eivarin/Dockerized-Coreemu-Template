@@ -1,14 +1,26 @@
 #!/bin/sh
-if [[ "$OSTYPE" == "darwin"* ]]; then
-  open -a XQuartz
-  xhost + > /dev/null
-  export DISPLAY=:0
-  docker-compose up -d core-for-mac
-  sleep 4
-  docker exec -itd core bash -c "mkdir -p /tmp/.X11-unix && socat UNIX-LISTEN:/tmp/.X11-unix/X0,fork,reuseaddr,unlink-early,mode=770 TCP:docker.for.mac.host.internal:6000"
-else
-  xhost +local:root
-  docker-compose up -d core
-  sleep 4
-fi
+case "$OSTYPE" in
+  darwin*)
+    if open -Ra XQuartz; then
+      open -a XQuartz
+    elif open -Ra X11; then
+      open -a X11
+    else
+      echo "XQuartz/X11 not found."
+      exit 1
+    fi
+    xhost +localhost  > /dev/null
+    export DISPLAY=:0
+    docker-compose up -d core-for-mac
+    sleep 4
+    docker exec -itd core bash -c "mkdir -p /tmp/.X11-unix && socat UNIX-LISTEN:/tmp/.X11-unix/X0,fork,reuseaddr,unlink-early,mode=770 TCP:docker.for.mac.host.internal:6000"
+    ;;
+  *)
+    if [ -z $WAYLAND_DISPLAY ]; then
+        xhost +local:root
+    fi
+    docker-compose up -d core
+    sleep 4
+    ;;
+esac
 docker exec -it core core-gui
