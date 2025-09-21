@@ -9,8 +9,9 @@ case "$OSTYPE" in
       echo "XQuartz/X11 not found."
       exit 1
     fi
-    xhost +localhost  > /dev/null
+    sleep 4
     export DISPLAY=:0
+    xhost +localhost  > /dev/null
     docker-compose up -d core-for-mac
     sleep 4
     docker exec -itd core bash -c "mkdir -p /tmp/.X11-unix && socat UNIX-LISTEN:/tmp/.X11-unix/X0,fork,reuseaddr,unlink-early,mode=770 TCP:docker.for.mac.host.internal:6000"
