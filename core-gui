@@ -16,7 +16,7 @@ case "$OSTYPE" in
     docker exec -itd core bash -c "mkdir -p /tmp/.X11-unix && socat UNIX-LISTEN:/tmp/.X11-unix/X0,fork,reuseaddr,unlink-early,mode=770 TCP:docker.for.mac.host.internal:6000"
     ;;
   *)
-    if [ -z $WAYLAND_DISPLAY ]; then
+    if [ -z "$WAYLAND_DISPLAY" ]; then
         xhost +local:root
     fi
     docker-compose up -d core
