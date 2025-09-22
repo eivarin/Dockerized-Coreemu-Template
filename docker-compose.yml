@@ -19,8 +19,16 @@ services:
     environment:
       - DISPLAY
     volumes:
+      - x11-unix:/tmp/.X11-unix/X0:rw
       - ./volume:/volume
       - ./.bashrc:/root/.bashrc
     privileged: true
     stdin_open: true 
     tty: true
+volumes:
+  x11-unix:
+    driver: local
+    driver_opts:
+      type: none
+      o: bind
+      device: "${X11_UNIX_VOLUME:-/tmp/.X11-unix}"

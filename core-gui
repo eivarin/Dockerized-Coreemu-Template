@@ -10,14 +10,15 @@ case "$OSTYPE" in
       exit 1
     fi
     sleep 4
+    export X11_UNIX_VOLUME=$DISPLAY
+    xhost +localhost > /dev/null
     export DISPLAY=:0
-    xhost +localhost  > /dev/null
     docker-compose up -d core-for-mac
     sleep 4
-    docker exec -itd core bash -c "mkdir -p /tmp/.X11-unix && socat UNIX-LISTEN:/tmp/.X11-unix/X0,fork,reuseaddr,unlink-early,mode=770 TCP:docker.for.mac.host.internal:6000"
+    # docker exec -itd core bash -c "mkdir -p /tmp/.X11-unix && socat UNIX-LISTEN:/tmp/.X11-unix/X0,fork,reuseaddr,unlink-early,mode=770 TCP:docker.for.mac.host.internal:6000"
     ;;
   *)
-    if which xhost &> /dev/null; then
+    if xhost > /dev/null 2>&1; then
         xhost +local:root
     fi
     docker-compose up -d core
