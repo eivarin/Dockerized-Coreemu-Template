@@ -1,35 +1,138 @@
 #!/bin/bash
-case "$OSTYPE" in
-  darwin*)
-    if open -Ra XQuartz; then
-      open -a XQuartz
-    elif open -Ra X11; then
-      open -a X11
-    else
-      echo "XQuartz/X11 not found."
-      exit 1
-    fi
-    sleep 4
-    export DISPLAY=:0
-    xhost +localhost  > /dev/null
-    if which docker-compose &> /dev/null; then
-        docker-compose up -d core-for-mac
-    else
-        docker compose up -d core-for-mac
-    fi
-    sleep 4
-    docker exec -itd core bash -c "mkdir -p /tmp/.X11-unix && socat UNIX-LISTEN:/tmp/.X11-unix/X0,fork,reuseaddr,unlink-early,mode=770 TCP:docker.for.mac.host.internal:6000"
-    ;;
-  *)
-    if which xhost &> /dev/null; then
-        xhost +local:root
-    fi
-    if which docker-compose &> /dev/null; then
-        docker-compose up -d core
-    else
-        docker compose up -d core
-    fi
-    sleep 4
-    ;;
-esac
-docker exec -it core core-gui
+show_help() {
+  echo "Usage: $(basename "$0") [OPTIONS]"
+  echo "A CLI tool to help launch Dockerized CoreEmu. Launches core-gui by default."
+  echo "Flags can be combined (e.g., '-ws' to start the container and open Wireshark and a shell)."
+  echo "Options:"
+  echo "  -h, --help       Show this help message"
+  echo "  -w, --wireshark  Open Wireshark in the container."
+  echo "  -s, --shell      Open a shell in the container instead of the default core-gui"
+  echo "  -d, --down       Stop the container and clean up resources (equivalent to 'docker compose down')"
+  echo "  -v, --verbose    Show verbose output during container startup"
+}
+
+COMPOSE="docker compose"
+if which docker-compose &> /dev/null; then
+    COMPOSE="docker-compose"
+fi
+
+start-container() {
+  case "$OSTYPE" in
+    darwin*)
+      if open -Ra XQuartz; then
+        open -a XQuartz
+      elif open -Ra X11; then
+        open -a X11
+      else
+        echo "XQuartz/X11 not found."
+        exit 1
+      fi
+      sleep 4
+      export DISPLAY=:0
+      xhost +localhost  > /dev/null
+      $COMPOSE up -d core-for-mac
+      docker exec -itd core bash -c "mkdir -p /tmp/.X11-unix && socat UNIX-LISTEN:/tmp/.X11-unix/X0,fork,reuseaddr,unlink-early,mode=770 TCP:docker.for.mac.host.internal:6000"
+      ;;
+    *)
+      if which xhost &> /dev/null; then
+          xhost +local:root
+      fi
+      $COMPOSE up -d core
+      ;;
+  esac
+  while ! docker exec -it core nc -z localhost 50051; do   
+    sleep 1
+    echo -n "Waiting for container to be ready... "
+  done
+}
+
+SHOW_HELP=0
+SHOW_HELP_EXIT=0
+START_CONTAINER=0
+EXEC_SHELL=0
+EXEC_WIRESHARK=0
+EXEC_CORE_GUI=0
+COMPOSE_DOWN=0
+VERBOSE_OUTPUT_FD=/dev/null
+
+parse_args() {
+  # echo "Processing flag: $1"
+  case "$1" in
+    h|help)
+      SHOW_HELP=1
+      ;;
+    s|shell)
+      START_CONTAINER=1
+      EXEC_SHELL=1
+      ;;
+    d|down)
+      COMPOSE_DOWN=1
+      ;;
+    w|wireshark)
+      START_CONTAINER=1
+      EXEC_WIRESHARK=1
+      ;;
+    v|verbose)
+      VERBOSE_OUTPUT_FD=/dev/stdout
+      ;;
+    *)
+      echo "Unknown flag: $1"
+      SHOW_HELP=1
+      SHOW_HELP_EXIT=1
+      ;;
+  esac
+}
+
+if [ $# -eq 0 ]; then
+  START_CONTAINER=1
+  EXEC_CORE_GUI=1
+else
+  for arg in ${@}; do
+    # echo "Processing argument: $arg"
+    case "$arg" in
+      --*)
+        parse_args "${arg:1}"
+        ;;
+      -*)
+        for (( i=1; i<${#arg}; i++ )); do
+          parse_args "${arg:$i:1}"
+        done
+        ;;
+      *)
+        echo "Unknown argument: $arg" 
+        show_help
+        exit 1
+        ;;
+    esac
+  done
+fi
+
+
+
+if [ $SHOW_HELP -eq 1 ]; then
+  show_help
+  exit $SHOW_HELP_EXIT
+fi
+
+if [ $COMPOSE_DOWN -eq 1 ]; then
+  $COMPOSE down
+  exit 0
+fi
+
+if [ $START_CONTAINER -eq 1 ]; then
+  start-container &> $VERBOSE_OUTPUT_FD
+fi
+
+if [ $EXEC_CORE_GUI -eq 1 ]; then
+  docker exec -it core core-gui
+  exit 0
+fi
+
+if [ $EXEC_WIRESHARK -eq 1 ]; then
+  docker exec -it -d core wireshark
+fi
+
+if [ $EXEC_SHELL -eq 1 ]; then
+  docker exec -it core bash
+  exit 0
+fi
