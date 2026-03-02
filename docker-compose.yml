@@ -1,6 +1,7 @@
 services:
-  core:
-    image: ghcr.io/eivarin/coreemu:coreemu-9.2.1
+  core: 
+    build: 
+      context: container
     container_name: core
     command: core-daemon
     environment:
@@ -9,11 +10,12 @@ services:
       - /tmp/.X11-unix:/tmp/.X11-unix:rw
       - ./volume:/volume
       - ./.bashrc:/root/.bashrc
+      - ./topologies:/root/.coregui/xmls/topologies
     privileged: true
-    stdin_open: true 
+    stdin_open: true
     tty: true
   core-for-mac:
-    image: ghcr.io/eivarin/coreemu:coreemu-9.2.1
+    build: container
     container_name: core
     command: core-daemon
     environment:
@@ -21,6 +23,7 @@ services:
     volumes:
       - ./volume:/volume
       - ./.bashrc:/root/.bashrc
+      - ./topologies:/root/.coregui/xmls/topologies
     privileged: true
-    stdin_open: true 
+    stdin_open: true
     tty: true
